@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';
 import * as dotenv from 'dotenv';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { PostsModule } from './posts/posts.module';
 
 dotenv.config();
 
@@ -19,8 +20,11 @@ dotenv.config();
         '?retryWrites=true&w=majority',
       ].join(''),
     ),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: 'schema.gql',
+    }),
+    PostsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

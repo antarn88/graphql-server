@@ -1,10 +1,13 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
 @ObjectType()
 @Schema()
 export class Post {
+  @Field(() => ID)
+  id: string;
+
   @Field(() => String)
   @Prop({ required: true })
   title: string;

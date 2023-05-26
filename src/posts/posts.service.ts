@@ -11,7 +11,7 @@ export class PostsService {
   constructor(@InjectModel(Post.name) private postModel: Model<PostDocument>) {}
 
   /**
-   * Retrieves all posts from the database, paginated by page and limit.
+   * Retrieves all posts with pagination.
    *
    * @param {number} page - The page number to retrieve.
    * @param {number} limit - The maximum number of posts to retrieve per page.
@@ -19,7 +19,7 @@ export class PostsService {
    */
   async findAll(page: number, limit: number): Promise<Post[]> {
     const skip = page > 0 ? (page - 1) * limit : 0;
-    return await this.postModel.find().limit(limit).skip(skip).exec();
+    return await this.postModel.find().sort({ createdAt: -1 }).limit(limit).skip(skip).exec();
   }
 
   /**

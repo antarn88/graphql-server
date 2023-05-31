@@ -1,5 +1,5 @@
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { Observable, take } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 import { Post } from './entities/post.entity';
 import { PostsService } from './posts.service';
@@ -11,65 +11,65 @@ export class PostsResolver {
   constructor(private readonly postsService: PostsService) {}
 
   /**
-   * Finds all posts given a page and limit and returns them as an Observable of Post array.
+   * Asynchronously finds all posts.
    *
-   * @param {number} page - The page number to retrieve. Nullable.
-   * @param {number} limit - The maximum number of posts to retrieve per page. Nullable.
-   * @return {Observable<Post[]>} An observable of an array of Posts.
+   * @param {number} page - The page number to retrieve posts from. Can be null.
+   * @param {number} limit - The maximum number of posts to retrieve per page. Can be null.
+   * @return {Promise<Post[]>} A promise that resolves to an array of Post objects.
    */
   @Query(() => [Post], { name: 'posts' })
-  findAll(
+  async findAll(
     @Args('page', { type: () => Int, nullable: true }) page: number,
     @Args('limit', { type: () => Int, nullable: true }) limit: number,
-  ): Observable<Post[]> {
-    return this.postsService.findAll(page, limit).pipe(take(1));
+  ): Promise<Post[]> {
+    return await firstValueFrom(this.postsService.findAll(page, limit));
   }
 
   /**
-   * Retrieves a single Post object based on the provided id.
+   * Asynchronously finds a single post by its ID.
    *
-   * @param {string} id - The id of the Post object to retrieve.
-   * @return {Observable<Post>} An Observable emitting the retrieved Post object.
+   * @param {string} id - The ID of the post to find.
+   * @return {Promise<Post>} A Promise that resolves with the found post.
    */
   @Query(() => Post, { name: 'post' })
-  findOne(@Args('id', { type: () => String }) id: string): Observable<Post> {
-    return this.postsService.findOne(id).pipe(take(1));
+  async findOne(@Args('id', { type: () => String }) id: string): Promise<Post> {
+    return await firstValueFrom(this.postsService.findOne(id));
   }
 
   /**
-   * Creates a new post.
+   * Asynchronously creates a new post from the provided input DTO.
    *
-   * @param {CreatePostInputDto} createPostInputDto - The input data for creating a post.
-   * @return {Observable<Post>} An observable containing the newly created post.
+   * @param {CreatePostInputDto} createPostInputDto - The input DTO containing the details of the post to be created.
+   * @return {Promise<Post>} A Promise that resolves with the created post.
    */
   @Mutation(() => Post)
-  createPost(@Args('createPostInput') createPostInputDto: CreatePostInputDto): Observable<Post> {
-    return this.postsService.create(createPostInputDto).pipe(take(1));
+  async createPost(@Args('createPostInput') createPostInputDto: CreatePostInputDto): Promise<Post> {
+    return await firstValueFrom(this.postsService.create(createPostInputDto));
   }
 
   /**
-   * Updates a post with the given id using the provided data.
+   * Updates a post with the given ID and returns the updated post.
    *
-   * @param {string} id - The id of the post to update.
+   * @param {string} id - The ID of the post to update.
    * @param {UpdatePostInputDto} updatePostInputDto - The data to update the post with.
-   * @return {Observable<Post>} An observable of the updated post.
+   * @returns {Promise<Post>} A Promise that resolves to the updated post.
    */
   @Mutation(() => Post)
-  updatePost(
+  async updatePost(
     @Args('id', { type: () => String }) id: string,
     @Args('updatePostInput') updatePostInputDto: UpdatePostInputDto,
-  ): Observable<Post> {
-    return this.postsService.update(id, updatePostInputDto).pipe(take(1));
+  ): Promise<Post> {
+    return await firstValueFrom(this.postsService.update(id, updatePostInputDto));
   }
 
   /**
    * Deletes a post with the given id.
    *
    * @param {string} id - The id of the post to be deleted.
-   * @return {Observable<boolean>} - An observable that emits a boolean indicating if the post was deleted successfully.
+   * @return {Promise<boolean>} A Promise that resolves to true if the post was successfully deleted, and false otherwise.
    */
   @Mutation(() => Boolean)
-  deletePost(@Args('id', { type: () => String }) id: string): Observable<boolean> {
-    return this.postsService.delete(id).pipe(take(1));
+  async deletePost(@Args('id', { type: () => String }) id: string): Promise<boolean> {
+    return await firstValueFrom(this.postsService.delete(id));
   }
 }

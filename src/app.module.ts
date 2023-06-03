@@ -5,6 +5,7 @@ import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';
 import * as dotenv from 'dotenv';
 
 import { PostsModule } from './posts/posts.module';
+import { PubSubModule } from './pub-sub/pub-sub.module';
 
 dotenv.config();
 
@@ -23,8 +24,12 @@ dotenv.config();
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'schema.gql',
+      subscriptions: {
+        'graphql-ws': true,
+      },
     }),
     PostsModule,
+    PubSubModule,
   ],
 })
 export class AppModule {}

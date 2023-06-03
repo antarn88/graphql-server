@@ -21,7 +21,12 @@ export class PostsService {
   }
 
   create(createPostInput: CreatePostInputDto): Observable<Post> {
-    const newPost = new this.postModel(createPostInput);
+    let newPost: PostDocument;
+    if (createPostInput.id) {
+      newPost = new this.postModel(createPostInput).$set('_id', createPostInput.id);
+    } else {
+      newPost = new this.postModel(createPostInput);
+    }
     return from(newPost.save());
   }
 
